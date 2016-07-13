@@ -1,1 +1,12 @@
-.babelrc
+/.idea/
+*.iml
+/dev/
+/node_modules/
+/tests/
+/tests_prerender/
+/webpack/
+/.babelrc
+/.gitignore
+/.npmignore
+/InputElement.js
+/karma.conf.js

@@ -1,7 +1,5 @@
 /.idea
 /node_modules
-/dev
-/build
 npm-debug.log
 /_site
 Gemfile.lock
@@ -9,3 +7,4 @@ Gemfile.lock
 browserStack.json
 
 browserStack.zip
+
