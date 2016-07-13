@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>React-input-mask by sanniassin</title>
+
+    <link rel="stylesheet" href="/stylesheets/styles.css">
+    <link rel="stylesheet" href="/stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <style type="text/css">
+        input {
+            line-height: 34px;
+        }
+    </style>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+<body>
+<div class="wrapper">
+    <header>
+        <h1>React-input-mask</h1>
+        <p>Yet another react component for input masking</p>
+
+        <p class="view"><a href="https://github.com/sanniassin/react-input-mask">View the Project on GitHub
+            <small>sanniassin/react-input-mask</small>
+        </a></p>
+
+
+        <ul>
+            <li><a href="https://github.com/sanniassin/react-input-mask/zipball/master">Download <strong>ZIP
+                File</strong></a></li>
+            <li><a href="https://github.com/sanniassin/react-input-mask/tarball/master">Download <strong>TAR
+                Ball</strong></a></li>
+            <li><a href="https://github.com/sanniassin/react-input-mask">View On <strong>GitHub</strong></a></li>
+        </ul>
+    </header>
+    <section>
+
+
+        <h1>Demos</h1>
+
+        <h2>Phones</h2>
+
+        <pre><code>&lt;InputElement mask="+4\9 99 999 99" maskChar={null}/&gt;</code></pre>
+        <div id="phone1"></div>
+        <pre><code>&lt;InputElement mask="+7 (999) 999-99-99"/&gt;</code></pre>
+        <div id="phone2"></div>
+        <h2>Dates</h2>
+
+        <pre><code id="date1-code">&lt;InputElement mask="99-99-9999" defaultValue="01-01-2015"/&gt;</code></pre>
+        <div id="date1"></div>
+        <pre><code id="date2-code">&lt;InputElement mask="99/99/9999" placeholder="Enter birthdate"/&gt;</code></pre>
+        <div id="date2"></div>
+        <h2>Credit card
+            <small>(autochange to Amex format if starts with 34 or 37)</small>
+        </h2>
+
+<pre><code id="card1-code">getInitialState: function() {
+    return {
+        value: "",
+        mask: "9999-9999-9999-9999"
+    };
+},
+onChange: function(event) {
+    var value = event.target.value;
+    var newState = {
+        mask: "9999-9999-9999-9999",
+        value: value
+    }
+    if (/^3[47]/.test(value)) {
+        newState.mask = "9999-999999-99999";
+    }
+    this.setState(newState);
+},
+render: function() {
+    return &lt;InputElement {...this.state} onChange={this.onChange}/&gt;;
+}</code></pre>
+        <div id="card1"></div>
+    </section>
+    <footer>
+        <p>This project is maintained by <a href="https://github.com/sanniassin">sanniassin</a></p>
+        <p>
+            <small>Hosted on GitHub Pages — Theme by <a href="https://github.com/orderedlist">orderedlist</a></small>
+        </p>
+    </footer>
+</div>
+<script type="text/javascript" src="/public/javascripts/bundle.js"></script>
+</body>
+</html>

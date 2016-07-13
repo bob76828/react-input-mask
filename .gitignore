@@ -1,4 +1,7 @@
+/.idea
 /node_modules
+/dev
+/build
 npm-debug.log
 /_site
 Gemfile.lock
