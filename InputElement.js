@@ -9,8 +9,9 @@ var InputElement = React.createClass({
         "*": "[A-Za-z0-9]"
     },
     defaultMaskChar: "_",
+    optionalIndex: -1,
     lastCaretPos: null,
-    isAndroidBrowser: function() {
+    isAndroidBrowser: function () {
         var windows = new RegExp("windows", "i");
         var firefox = new RegExp("firefox", "i");
         var android = new RegExp("android", "i");
@@ -21,30 +22,30 @@ var InputElement = React.createClass({
                &&
                android.test(ua);
     },
-    isWindowsPhoneBrowser: function() {
+    isWindowsPhoneBrowser: function () {
         var windows = new RegExp("windows", "i");
         var phone = new RegExp("phone", "i");
         var ua = navigator.userAgent;
         return windows.test(ua) && phone.test(ua);
     },
-    isAndroidFirefox: function() {
+    isAndroidFirefox: function () {
         var windows = new RegExp("windows", "i");
         var firefox = new RegExp("firefox", "i");
         var android = new RegExp("android", "i");
         var ua = navigator.userAgent;
         return !windows.test(ua)
-               &&
-               firefox.test(ua)
-               &&
-               android.test(ua);
+            &&
+            firefox.test(ua)
+            &&
+            android.test(ua);
     },
-    isDOMElement: function(element) {
+    isDOMElement: function (element) {
         return typeof HTMLElement === "object"
-               ? element instanceof HTMLElement // DOM2
-               : element.nodeType === 1 && typeof element.nodeName === "string";
+            ? element instanceof HTMLElement // DOM2
+            : element.nodeType === 1 && typeof element.nodeName === "string";
     },
     // getDOMNode is deprecated but we need it to stay compatible with React 0.12
-    getInputDOMNode: function() {
+    getInputDOMNode: function () {
         var input = this.refs.input;
 
         if (!input) {
@@ -58,7 +59,7 @@ var InputElement = React.createClass({
 
         return input.getDOMNode();
     },
-    enableValueAccessors: function() {
+    enableValueAccessors: function () {
         var canUseAccessors = !!(Object.getOwnPropertyDescriptor && Object.getPrototypeOf && Object.defineProperty);
         if (canUseAccessors) {
             var input = this.getInputDOMNode();
@@ -74,7 +75,7 @@ var InputElement = React.createClass({
             });
         }
     },
-    disableValueAccessors: function() {
+    disableValueAccessors: function () {
         var { valueDescriptor } = this;
         if (!valueDescriptor) {
             return;
@@ -83,7 +84,7 @@ var InputElement = React.createClass({
         var input = this.getInputDOMNode();
         Object.defineProperty(input, 'value', valueDescriptor);
     },
-    getInputValue: function() {
+    getInputValue: function () {
         var input = this.getInputDOMNode();
         var { valueDescriptor } = this;
 
@@ -97,7 +98,7 @@ var InputElement = React.createClass({
 
         return value;
     },
-    getPrefix: function() {
+    getPrefix: function () {
         var prefix = "";
         var { mask } = this;
         for (var i = 0; i < mask.length && this.isPermanentChar(i); ++i) {
@@ -105,7 +106,7 @@ var InputElement = React.createClass({
         }
         return prefix;
     },
-    getFilledLength: function(value = this.state.value) {
+    getFilledLength: function (value = this.state.value) {
         var i;
         var { maskChar } = this;
 
@@ -122,7 +123,7 @@ var InputElement = React.createClass({
 
         return ++i || this.getPrefix().length;
     },
-    getLeftEditablePos: function(pos) {
+    getLeftEditablePos: function (pos) {
         for (var i = pos; i >= 0; --i) {
             if (!this.isPermanentChar(i)) {
                 return i;
@@ -130,7 +131,7 @@ var InputElement = React.createClass({
         }
         return null;
     },
-    getRightEditablePos: function(pos) {
+    getRightEditablePos: function (pos) {
         var { mask } = this;
         for (var i = pos; i < mask.length; ++i) {
             if (!this.isPermanentChar(i)) {
@@ -139,22 +140,22 @@ var InputElement = React.createClass({
         }
         return null;
     },
-    isEmpty: function(value = this.state.value) {
+    isEmpty: function (value = this.state.value) {
         return !value.split("").some((character, i) =>
             !this.isPermanentChar(i) && this.isAllowedChar(character, i)
         );
     },
-    isFilled: function(value = this.state.value) {
+    isFilled: function (value = this.state.value) {
         return this.getFilledLength(value) === this.mask.length;
     },
-    createFilledArray: function(length, val) {
+    createFilledArray: function (length, val) {
         var array = [];
         for (var i = 0; i < length; i++) {
             array[i] = val;
         }
         return array;
     },
-    formatValue: function(value) {
+    formatValue: function (value) {
         var { maskChar, mask } = this;
         if (!maskChar) {
             var prefix = this.getPrefix();
@@ -175,44 +176,44 @@ var InputElement = React.createClass({
             return this.insertRawSubstr(emptyValue, value, 0);
         }
         return value.split("")
-                    .concat(this.createFilledArray(mask.length - value.length, null))
-                    .map((character, pos) => {
-                        if (this.isAllowedChar(character, pos)) {
-                            return character;
-                        }
-                        else if (this.isPermanentChar(pos)) {
-                            return mask[pos];
-                        }
-                        return maskChar;
-                    })
-                    .join("");
+            .concat(this.createFilledArray(mask.length - value.length, null))
+            .map((character, pos) => {
+                if (this.isAllowedChar(character, pos)) {
+                    return character;
+                }
+                else if (this.isPermanentChar(pos)) {
+                    return mask[pos];
+                }
+                return maskChar;
+            })
+            .join("");
     },
-    clearRange: function(value, start, len) {
+    clearRange: function (value, start, len) {
         var end = start + len;
         var { maskChar, mask } = this;
         if (!maskChar) {
             var prefixLen = this.getPrefix().length;
             value = value.split("")
-                         .filter((character, i) => i < prefixLen || i < start || i >= end)
-                         .join("");
+                .filter((character, i) => i < prefixLen || i < start || i >= end)
+                .join("");
             return this.formatValue(value);
         }
         return value.split("")
-                    .map((character, i) => {
-                        if (i < start || i >= end) {
-                            return character;
-                        }
-                        if (this.isPermanentChar(i)) {
-                            return mask[i];
-                        }
-                        return maskChar;
-                    })
-                    .join("");
+            .map((character, i) => {
+                if (i < start || i >= end) {
+                    return character;
+                }
+                if (this.isPermanentChar(i)) {
+                    return mask[i];
+                }
+                return maskChar;
+            })
+            .join("");
     },
-    replaceSubstr: function(value, newSubstr, pos) {
+    replaceSubstr: function (value, newSubstr, pos) {
         return value.slice(0, pos) + newSubstr + value.slice(pos + newSubstr.length);
     },
-    insertRawSubstr: function(value, substr, pos) {
+    insertRawSubstr: function (value, substr, pos) {
         var { mask, maskChar } = this;
         var isFilled = this.isFilled(value);
         var prefixLen = this.getPrefix().length;
@@ -222,7 +223,7 @@ var InputElement = React.createClass({
             value += mask.slice(value.length, pos);
         }
 
-        for (var i = pos; i < mask.length && substr.length; ) {
+        for (var i = pos; i < mask.length && substr.length;) {
             var isPermanent = this.isPermanentChar(i);
             if (!isPermanent || mask[i] === substr[0]) {
                 var character = substr.shift();
@@ -253,10 +254,10 @@ var InputElement = React.createClass({
         }
         return value;
     },
-    getRawSubstrLength: function(value, substr, pos) {
+    getRawSubstrLength: function (value, substr, pos) {
         var { mask, maskChar } = this;
         substr = substr.split("");
-        for (var i = pos; i < mask.length && substr.length; ) {
+        for (var i = pos; i < mask.length && substr.length;) {
             if (!this.isPermanentChar(i) || mask[i] === substr[0]) {
                 var character = substr.shift();
                 if (this.isAllowedChar(character, i, true)) {
@@ -269,7 +270,7 @@ var InputElement = React.createClass({
         }
         return i - pos;
     },
-    isAllowedChar: function(character, pos, allowMaskChar = false) {
+    isAllowedChar: function (character, pos, allowMaskChar = false) {
         var { mask, maskChar } = this;
         if (this.isPermanentChar(pos)) {
             return mask[pos] === character;
@@ -278,17 +279,17 @@ var InputElement = React.createClass({
         var charRule = this.charsRules[ruleChar];
         return (new RegExp(charRule)).test(character || "") || (allowMaskChar && character === maskChar);
     },
-    isPermanentChar: function(pos) {
+    isPermanentChar: function (pos) {
         return this.permanents.indexOf(pos) !== -1;
     },
-    setCaretToEnd: function() {
+    setCaretToEnd: function () {
         var filledLen = this.getFilledLength();
         var pos = this.getRightEditablePos(filledLen);
         if (pos !== null) {
             this.setCaretPos(pos);
         }
     },
-    setSelection: function(start, len = 0) {
+    setSelection: function (start, len = 0) {
         var input = this.getInputDOMNode();
         if (!input) {
             return;
@@ -307,7 +308,7 @@ var InputElement = React.createClass({
             range.select();
         }
     },
-    getSelection: function() {
+    getSelection: function () {
         var input = this.getInputDOMNode();
         var start = 0;
         var end = 0;
@@ -330,17 +331,17 @@ var InputElement = React.createClass({
             length: end - start
         };
     },
-    getCaretPos: function() {
+    getCaretPos: function () {
         return this.getSelection().start;
     },
-    setCaretPos: function(pos) {
+    setCaretPos: function (pos) {
         var raf = window.requestAnimationFrame
-                  ||
-                  window.webkitRequestAnimationFrame
-                  ||
-                  window.mozRequestAnimationFrame
-                  ||
-                  ((fn) => setTimeout(fn, 0));
+            ||
+            window.webkitRequestAnimationFrame
+            ||
+            window.mozRequestAnimationFrame
+            ||
+            ((fn) => setTimeout(fn, 0));
 
         var setPos = this.setSelection.bind(this, pos, 0);
 
@@ -349,7 +350,7 @@ var InputElement = React.createClass({
 
         this.lastCaretPos = pos;
     },
-    isFocused: function() {
+    isFocused: function () {
         return document.activeElement === this.getInputDOMNode();
     },
     parseMask: function(mask) {
@@ -387,14 +388,15 @@ var InputElement = React.createClass({
             permanents: permanents
         };
     },
-    getStringValue: function(value) {
+    getStringValue: function (value) {
         return !value && value !== 0 ? "" : value + "";
     },
-    getInitialState: function() {
+    getInitialState: function () {
         this.hasValue = this.props.value != null;
+        this.optionalIndex = this.props.mask.indexOf('?');
         this.charsRules = "formatChars" in this.props ? this.props.formatChars : this.defaultCharsRules;
 
-        var mask = this.parseMask(this.props.mask);
+        var mask = this.parseMask(this.props.mask.replace('?', ''));
         var defaultValue = this.props.defaultValue != null
             ? this.props.defaultValue
             : '';
@@ -415,19 +417,21 @@ var InputElement = React.createClass({
 
         return { value };
     },
-    componentWillMount: function() {
+    componentWillMount: function () {
         var { mask } = this;
         var { value } = this.state;
         if (mask && value) {
             this.setState({ value });
         }
     },
-    componentWillReceiveProps: function(nextProps) {
+    componentWillReceiveProps: function (nextProps) {
         this.hasValue = this.props.value != null;
         this.charsRules = "formatChars" in nextProps ? nextProps.formatChars : this.defaultCharsRules;
+        this.optionalIndex = this.props.mask.indexOf('?');
+
 
         var oldMask = this.mask;
-        var mask = this.parseMask(nextProps.mask);
+        var mask = this.parseMask(nextProps.mask.replace('?', ''));
         var isMaskChanged = mask.mask && mask.mask !== this.mask;
 
         this.mask = mask.mask;
@@ -534,7 +538,7 @@ var InputElement = React.createClass({
             this.setCaretPos(caretPos);
         }
     },
-    onKeyPress: function(event) {
+    onKeyPress: function (event) {
         var key = event.key;
         var hasHandler = typeof this.props.onKeyPress === "function";
         if (key === "Enter" || event.ctrlKey || event.metaKey) {
@@ -682,7 +686,7 @@ var InputElement = React.createClass({
         }
         this.setCaretPos(caretPos);
     },
-    onFocus: function(event) {
+    onFocus: function (event) {
         if (!this.state.value) {
             var prefix = this.getPrefix();
             var value = this.formatValue(prefix);
@@ -695,17 +699,24 @@ var InputElement = React.createClass({
             if (typeof this.props.onChange === "function") {
                 this.props.onChange(event);
             }
-        }
-        else if (this.getFilledLength() < this.mask.length) {
-            this.setCaretToEnd();
+        } else if (this.getFilledLength() < this.mask.length) {
+            if (this.optionalIndex !== -1) {
+                var tempValue = this.state.value.substr(0, this.getFilledLength());
+                var optionMask = this.mask.substring(this.getFilledLength()).replace(/[a9\*]/g, this.maskChar);
+                this.setState({
+                    value: tempValue + optionMask
+                }, this.setCaretToEnd);
+            } else {
+                this.setCaretToEnd();
+            }
         }
 
         if (typeof this.props.onFocus === "function") {
             this.props.onFocus(event);
         }
     },
-    onBlur: function(event) {
-        if (!this.props.alwaysShowMask && this.isEmpty(this.state.value)) {
+    onBlur: function (event) {
+        var clear = function () {
             event.target.value = "";
             this.setState({
                 value: this.hasValue ? this.state.value : ""
@@ -713,13 +724,34 @@ var InputElement = React.createClass({
             if (typeof this.props.onChange === "function") {
                 this.props.onChange(event);
             }
-        }
+        }.bind(this);
+        var requiredValue = this.optionalIndex === -1 ? this.state.value : this.state.value.substring(0, this.optionalIndex);
+        var optionalValue = this.optionalIndex === -1 ? '' : this.state.value.substring(this.optionalIndex);
 
-        if (typeof this.props.onBlur === "function") {
-            this.props.onBlur(event);
+        if (requiredValue.indexOf(this.maskChar) === -1) {
+            if (optionalValue !== '') {
+                var optionMask = this.mask.substring(this.optionalIndex).replace(/[a9\*]/g, this.maskChar);
+                if (optionMask === optionalValue) {
+                    event.target.value = requiredValue;
+                } else {
+                    var maskCharIndex = optionalValue.indexOf(this.maskChar);
+                    optionalValue = maskCharIndex === -1 ? optionalValue : optionalValue.substr(0, maskCharIndex);
+                    event.target.value = requiredValue + optionalValue;
+                }
+                this.setState({ value: event.target.value });
+                if (typeof this.props.onChange === "function") {
+                    this.props.onChange(event);
+                }
+            }
+
+            if (typeof this.props.onBlur === "function") {
+                this.props.onBlur(event);
+            }
+        } else {
+            clear();
         }
     },
-    onPaste: function(event) {
+    onPaste: function (event) {
         if (this.isAndroidBrowser) {
             this.pasteSelection = this.getSelection();
             event.target.value = "";
@@ -739,7 +771,7 @@ var InputElement = React.createClass({
         }
         event.preventDefault();
     },
-    pasteText: function(value, text, selection, event) {
+    pasteText: function (value, text, selection, event) {
         var caretPos = selection.start;
         if (selection.length) {
             value = this.clearRange(value, caretPos, selection.length);
@@ -761,7 +793,7 @@ var InputElement = React.createClass({
         }
         this.setCaretPos(caretPos);
     },
-    componentDidMount: function() {
+    componentDidMount: function () {
         this.isAndroidBrowser = this.isAndroidBrowser();
         this.isWindowsPhoneBrowser = this.isWindowsPhoneBrowser();
         this.isAndroidFirefox = this.isAndroidFirefox();
