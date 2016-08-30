@@ -724,6 +724,9 @@ var InputElement = React.createClass({
             if (typeof this.props.onChange === "function") {
                 this.props.onChange(event);
             }
+            if (typeof this.props.onBlur === "function") {
+                this.props.onBlur(event);
+            }
         }.bind(this);
         var requiredValue = this.optionalIndex === -1 ? this.state.value : this.state.value.substring(0, this.optionalIndex);
         var optionalValue = this.optionalIndex === -1 ? '' : this.state.value.substring(this.optionalIndex);
